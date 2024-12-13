@@ -56,3 +56,31 @@ saguaro <- read.csv("C:/Users/mathi/Documents/Saguaro_Data/SaguaroCensusData+csv
     select(-c(16:49))
   
   
+  
+  subset_saguaro <- tidy_saguaro %>%
+    select(PLOTID, Year, Height) %>%
+    mutate(Height = ifelse(Height < 0, NA, Height)) # Replace values < 0 with NA
+  
+  
+  plot_dependent_check <- aov(Height ~ PLOTID, data = subset_saguaro)
+  summary(plot_dependent_check)
+  
+  # Aggregate data by Year
+  avg_height_per_year <- subset_saguaro %>%
+    group_by(Year) %>%
+    summarise(Average_Height = mean(Height, na.rm = TRUE))
+    # Bar plot with color responding to the year
+  ggplot(avg_height_per_year, aes(x = Year, y = Average_Height, fill = Average_Height)) +
+    geom_bar(stat = "identity", color = "black") + # Black outline for the bars
+    scale_fill_viridis_c(option = "viridis", name = "Height", begin = 0.3, end = 0.9) + # Use the turbo palette
+    theme_minimal() +
+    labs(
+      title = "Average Saguaro Height",
+      x = "Year",
+      y = "Average Height, Inches"
+    ) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  
+  ##add summer peak temperature, or yearly average?
+  ##graph (jittered) dot plot of height vs time, with color being avg temp
+  
